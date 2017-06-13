@@ -10,6 +10,6 @@
     "request": "^2.81.0"
   },
   "scripts": {
-    "data:update": "node ./bin/get-attendees.js > src/data/attendees.json"
+    "data:update": "node ./bin/get-attendees.js > docs/data/attendees.json"
   }
 }
