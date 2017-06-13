@@ -1,0 +1,9 @@
+{
+  "name": "fronteers-attendees",
+  "version": "1.0.0",
+  "description": "Statistical analysis of Fronteers attendees",
+  "main": "./src/index.js",
+  "repository": "https://github.com/timseverien/fronteers-attendees.git",
+  "author": "Tim Severien <timseverien@gmail.com>",
+  "license": "MIT"
+}
