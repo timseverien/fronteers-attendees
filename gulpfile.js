@@ -50,6 +50,6 @@ gulp.task('views', () => {
 gulp.task('default', done => runSequence('scripts', 'views', done));
 
 gulp.task('watch', ['default'], () => {
-  gulp.watch(config.scripts.source, gulp.series('scripts'));
-  gulp.watch(config.views.source, gulp.series('views'));
+  gulp.watch(config.scripts.source, ['scripts']);
+  gulp.watch(config.views.source, ['views']);
 });
