@@ -25,6 +25,7 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
+    "d3": "^4.9.1",
     "whatwg-fetch": "^2.0.3"
   }
 }
