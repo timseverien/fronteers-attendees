@@ -3,5 +3,5 @@ export default (response) => {
     return Promise.reject(new Error(response.statusText));
   }
 
-  Promise.resolve(response);
+  return response;
 };
