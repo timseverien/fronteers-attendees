@@ -22,11 +22,15 @@ const getAttendees = (year) => new Promise((resolve, reject) => {
   request(requestOptions, (err, response, body) => {
     if (err) return reject(err);
 
-    resolve(body[`fronteers${year}`]);
+    const data = body[`fronteers${year}`];
+    data.year = year;
+
+    resolve(data);
   });
 });
 
 const normalize = (edition) => ({
+  year: edition.year,
   amount: edition.numberOfAttendeesThisyear,
   attendees: edition.andAllTheirOtherData.map((attendee) => ({
     name: attendee.name,
