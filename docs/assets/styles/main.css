@@ -1,5 +1,18 @@
+* {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  color: #333;
+  font-family: sans;
+}
+
 .container {
-  max-width: 36em;
+  max-width: 42em;
   padding-left: 1em;
   padding-right: 1em;
   margin-left: auto;
