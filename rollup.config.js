@@ -6,6 +6,7 @@ export default {
   dest: 'docs/assets/scripts/main.js',
   format: 'iife',
   moduleName: 'App',
+  sourceMap: true,
   plugins: [
     buble(),
     resolve(),

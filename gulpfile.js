@@ -1,7 +1,9 @@
 const gulp = require('gulp');
 const handlebars = require('gulp-compile-handlebars');
 const rename = require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
 
+const buffer = require('vinyl-buffer');
 const rollup = require('rollup-stream');
 const runSequence = require('run-sequence');
 const source = require('vinyl-source-stream');
@@ -25,6 +27,9 @@ const config = {
 gulp.task('scripts', () => {
   return rollup('rollup.config.js')
     .pipe(source('main.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(config.scripts.destination));
 });
 
