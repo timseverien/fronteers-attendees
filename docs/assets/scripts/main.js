@@ -1,6 +1,21 @@
 (function () {
 'use strict';
 
+var padding = 16;
+
+var createChartConfig = function (container) {
+  var width = container.clientWidth;
+  var height = width * .5;
+
+  return {
+    height: height,
+    heightInner: height - padding * 2,
+    padding: padding,
+    width: width,
+    widthInner: width - padding * 2,
+  };
+};
+
 var fetchError = function (response) {
   if (!response.ok) {
     return Promise.reject(new Error(response.statusText));
@@ -3353,6 +3368,12 @@ function set$2(object, f) {
 
   return set;
 }
+
+var entries = function(map) {
+  var entries = [];
+  for (var key in map) { entries.push({key: key, value: map[key]}); }
+  return entries;
+};
 
 function objectConverter(columns) {
   return new Function("d", "return {" + columns.map(function(name, i) {
@@ -7059,20 +7080,17 @@ function triangleArea(a, b, c) {
   return (a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]);
 }
 
-var padding = 20;
-
-var createAttendeesChart = function (container, data) {
-  var height = 256;
-  var heightInner = height - padding * 2;
-  var width = container.parentNode.clientWidth;
-  var widthInner = width - padding * 2;
-
-  var barWidth = widthInner / data.length;
-  var barWidthHalf = barWidth * .5;
+var createAttendeesChart = function (container, data, config) {
+  var height = config.height;
+  var heightInner = config.heightInner;
+  var padding = config.padding;
+  var width = config.width;
+  var widthInner = config.widthInner;
 
   var attendeesMax = max(data, function (d) { return d.attendees.length; });
-
-  var c = hsl(20, 0.5, 0.5);
+  var barWidth = widthInner / data.length;
+  var barWidthHalf = barWidth * .5;
+  var fontSize = 16;
 
   var scaleX = linear$2()
     .domain([0, data.length])
@@ -7080,7 +7098,7 @@ var createAttendeesChart = function (container, data) {
 
   var scaleY = linear$2()
     .domain([0, attendeesMax])
-    .range([padding, padding + heightInner]);
+    .range([padding, padding + heightInner - padding - fontSize]);
 
   var svg = select(container)
     .attr('height', height)
@@ -7092,24 +7110,85 @@ var createAttendeesChart = function (container, data) {
 
   entry.append('rect')
     .attr('x', function (d, i) { return scaleX(i); })
-    .attr('y', function (d) { return (padding + heightInner) - scaleY(d.attendees.length); })
+    .attr('y', function (d) { return scaleY(attendeesMax) + padding - scaleY(d.attendees.length); })
     .attr('fill', function (d, i) { return plasma(i / data.length); })
     .attr('height', function (d) { return scaleY(d.attendees.length); })
     .attr('width', barWidth);
 
   entry.append('text')
     .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
-    .attr('y', padding + heightInner + 20)
+    .attr('y', scaleY(attendeesMax) + padding + padding)
     .attr('text-anchor', 'middle')
     .text(function (d, i) { return i + 2008; });
 };
 
-var elementChartContainer = document.querySelector('.js-chart-container');
+var countSimilarObjects = function () {
+  var getKey = function (d) { return d; };
+
+  return {
+    key: function key(f) {
+      getKey = f;
+      return this;
+    },
+
+    data: function data(data$1) {
+      return data$1.reduce(function (obj, attendee) {
+        var key = getKey(attendee);
+
+        if (!(key in obj)) {
+          obj[key] = 0;
+        }
+
+        obj[key]++;
+
+        return obj;
+      }, {});
+    },
+  };
+};
+
+var compareEntriesByValueAndKey = function (a, b) {
+  var diff = b.value - a.value;
+
+  if (diff === 0) {
+    return a.key.localeCompare(b.key);
+  }
+
+  return diff;
+};
+
+var createTopAttendeesList = function (container, data) {
+  var list = select(container);
+
+  var attendees = data.reduce(function (total, edition) { return total.concat(edition.attendees); }, []);
+
+  var attendeesTop = countSimilarObjects()
+    .key(function (d) { return d.name; })
+    .data(attendees);
+
+  var attendeesTopEntries = entries(attendeesTop)
+    .sort(compareEntriesByValueAndKey)
+    .slice(0, 20);
+
+  list.selectAll('li')
+    .data(attendeesTopEntries)
+    .enter().append('li')
+    .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
+};
+
+var chartAttendees = document.querySelector('.js-chart-attendees');
+var listTopAttendees = document.querySelector('.js-list-top-attendees');
+
+var chartConfig = createChartConfig(chartAttendees.parentElement);
 
 fetch('data/attendees.json')
   .then(fetchError)
   .then(function (response) { return response.json(); })
-  .then(function (response) { return createAttendeesChart(elementChartContainer, response); })
+  .then(function (response) {
+    createAttendeesChart(chartAttendees, response, chartConfig);
+    createTopAttendeesList(listTopAttendees, response);
+  })
   .catch(console.error);
 
 }());
+//# sourceMappingURL=main.js.map
