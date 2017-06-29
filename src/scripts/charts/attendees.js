@@ -38,8 +38,14 @@ export default (container, data, config) => {
     .attr('width', barWidth);
 
   entry.append('text')
+    .attr('class', 'chart__value text-middle')
+    .attr('x', (d, i) => barWidthHalf + scaleX(i))
+    .attr('y', scaleY(attendeesMax))
+    .text(d => d.attendees.length);
+
+  entry.append('text')
+    .attr('class', 'text-middle')
     .attr('x', (d, i) => barWidthHalf + scaleX(i))
     .attr('y', scaleY(attendeesMax) + padding + padding)
-    .attr('text-anchor', 'middle')
     .text((d, i) => i + 2008);
 };

@@ -7116,9 +7116,15 @@ var createAttendeesChart = function (container, data, config) {
     .attr('width', barWidth);
 
   entry.append('text')
+    .attr('class', 'chart__value text-middle')
+    .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
+    .attr('y', scaleY(attendeesMax))
+    .text(function (d) { return d.attendees.length; });
+
+  entry.append('text')
+    .attr('class', 'text-middle')
     .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
     .attr('y', scaleY(attendeesMax) + padding + padding)
-    .attr('text-anchor', 'middle')
     .text(function (d, i) { return i + 2008; });
 };
 

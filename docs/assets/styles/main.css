@@ -18,3 +18,12 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
+.chart__value {
+  fill: #fff;
+  font-weight: bold;
+}
+
+.text-middle {
+  text-anchor: middle;
+}
