@@ -10,7 +10,7 @@ export default (container, data, config) => {
   } = config;
 
   const attendeesMax = d3.max(data, d => d.attendees.length);
-  const barWidth = widthInner / data.length;
+  const barWidth = (widthInner / data.length) * .95;
   const barWidthHalf = barWidth * .5;
   const fontSize = 16;
 
@@ -21,6 +21,10 @@ export default (container, data, config) => {
   const scaleY = d3.scaleLinear()
     .domain([0, attendeesMax])
     .range([padding, padding + heightInner - padding - fontSize]);
+
+  var color = d3.scaleLinear()
+    .domain([0, data.length])
+    .range(['#0079ad', '#009de0']);
 
   const svg = d3.select(container)
     .attr('height', height)
@@ -33,7 +37,7 @@ export default (container, data, config) => {
   entry.append('rect')
     .attr('x', (d, i) => scaleX(i))
     .attr('y', d => scaleY(attendeesMax) + padding - scaleY(d.attendees.length))
-    .attr('fill', (d, i) => d3.interpolatePlasma(i / data.length))
+    .attr('fill', (d, i) => color(i))
     .attr('height', d => scaleY(d.attendees.length))
     .attr('width', barWidth);
 
