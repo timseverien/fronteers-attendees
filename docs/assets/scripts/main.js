@@ -7122,6 +7122,16 @@ var createAttendeesChart = function (container, data, config) {
     .text(function (d, i) { return i + 2008; });
 };
 
+var compareEntriesByValueAndKey = function (a, b) {
+  var diff = b.value - a.value;
+
+  if (diff === 0) {
+    return a.key.localeCompare(b.key);
+  }
+
+  return diff;
+};
+
 var countSimilarObjects = function () {
   var getKey = function (d) { return d; };
 
@@ -7147,20 +7157,11 @@ var countSimilarObjects = function () {
   };
 };
 
-var compareEntriesByValueAndKey = function (a, b) {
-  var diff = b.value - a.value;
-
-  if (diff === 0) {
-    return a.key.localeCompare(b.key);
-  }
-
-  return diff;
-};
+var getAttendees = function (data) { return data.reduce(function (total, d) { return total.concat(d.attendees); }, []); };
 
 var createTopAttendeesList = function (container, data) {
   var list = select(container);
-
-  var attendees = data.reduce(function (total, edition) { return total.concat(edition.attendees); }, []);
+  var attendees = getAttendees(data);
 
   var attendeesTop = countSimilarObjects()
     .key(function (d) { return d.name; })
@@ -7176,8 +7177,27 @@ var createTopAttendeesList = function (container, data) {
     .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
 };
 
+var createTopFirstNameList = function (container, data) {
+  var list = select(container);
+  var attendees = getAttendees(data);
+
+  var attendeesTop = countSimilarObjects()
+    .key(function (d) { return d.name.split(' ').shift(); })
+    .data(attendees);
+
+  var attendeesTopEntries = entries(attendeesTop)
+    .sort(compareEntriesByValueAndKey)
+    .slice(0, 20);
+
+  list.selectAll('li')
+    .data(attendeesTopEntries)
+    .enter().append('li')
+    .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
+};
+
 var chartAttendees = document.querySelector('.js-chart-attendees');
 var listTopAttendees = document.querySelector('.js-list-top-attendees');
+var listTopFirstNames = document.querySelector('.js-list-top-first-names');
 
 var chartConfig = createChartConfig(chartAttendees.parentElement);
 
@@ -7187,6 +7207,7 @@ fetch('data/attendees.json')
   .then(function (response) {
     createAttendeesChart(chartAttendees, response, chartConfig);
     createTopAttendeesList(listTopAttendees, response);
+    createTopFirstNameList(listTopFirstNames, response);
   })
   .catch(console.error);
 

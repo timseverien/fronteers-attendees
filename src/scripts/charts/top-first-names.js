@@ -4,11 +4,11 @@ import countSimilarObjects from '../utils/count-similar-objects';
 import getAttendees from '../utils/get-attendees';
 
 export default (container, data) => {
-  const list = d3.select(container);
+  const list = d3.select(container)
   const attendees = getAttendees(data);
 
   const attendeesTop = countSimilarObjects()
-    .key(d => d.name)
+    .key(d => d.name.split(' ').shift())
     .data(attendees);
 
   const attendeesTopEntries = d3.entries(attendeesTop)
