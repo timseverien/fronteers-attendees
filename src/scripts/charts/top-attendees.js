@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import arrayUnique from '../utils/array-unique';
 import compareEntriesByValueAndKey from '../utils/compare-entries-by-value-and-key';
 import countSimilarObjects from '../utils/count-similar-objects';
 import getAttendees from '../utils/get-attendees';
@@ -12,11 +13,15 @@ export default (container, data) => {
     .data(attendees);
 
   const attendeesTopEntries = d3.entries(attendeesTop)
-    .sort(compareEntriesByValueAndKey)
-    .slice(0, 20);
+    .sort(compareEntriesByValueAndKey);
+
+  const valueMapping = attendeesTopEntries
+    .map(d => d.value)
+    .reduce(arrayUnique, []);
 
   list.selectAll('li')
     .data(attendeesTopEntries)
     .enter().append('li')
-    .text((d) => `${d.key} (${d.value})`);
+    .attr('value', d => valueMapping.indexOf(d.value) + 1)
+    .text(d => `${d.key} (${d.value})`);
 };

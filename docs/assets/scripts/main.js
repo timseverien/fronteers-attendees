@@ -7128,6 +7128,14 @@ var createAttendeesChart = function (container, data, config) {
     .text(function (d, i) { return i + 2008; });
 };
 
+var arrayUnique = function (arr, value) {
+  if (arr.indexOf(value) === -1) {
+    arr.push(value);
+  }
+
+  return arr;
+};
+
 var compareEntriesByValueAndKey = function (a, b) {
   var diff = b.value - a.value;
 
@@ -7174,12 +7182,16 @@ var createTopAttendeesList = function (container, data) {
     .data(attendees);
 
   var attendeesTopEntries = entries(attendeesTop)
-    .sort(compareEntriesByValueAndKey)
-    .slice(0, 20);
+    .sort(compareEntriesByValueAndKey);
+
+  var valueMapping = attendeesTopEntries
+    .map(function (d) { return d.value; })
+    .reduce(arrayUnique, []);
 
   list.selectAll('li')
     .data(attendeesTopEntries)
     .enter().append('li')
+    .attr('value', function (d) { return valueMapping.indexOf(d.value) + 1; })
     .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
 };
 
@@ -7192,12 +7204,16 @@ var createTopFirstNameList = function (container, data) {
     .data(attendees);
 
   var attendeesTopEntries = entries(attendeesTop)
-    .sort(compareEntriesByValueAndKey)
-    .slice(0, 20);
+    .sort(compareEntriesByValueAndKey);
+
+  var valueMapping = attendeesTopEntries
+    .map(function (d) { return d.value; })
+    .reduce(arrayUnique, []);
 
   list.selectAll('li')
     .data(attendeesTopEntries)
     .enter().append('li')
+    .attr('value', function (d) { return valueMapping.indexOf(d.value) + 1; })
     .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
 };
 
