@@ -7217,6 +7217,33 @@ var createTopFirstNameList = function (container, data) {
     .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
 };
 
+var CLASS = 'expandable-list';
+var CLASS_COLLAPSED = 'expandable-list--collapsed';
+
+var insertAfter = function (newNode, referenceNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+};
+
+var toggle = function (list, button) {
+  list.classList.toggle(CLASS_COLLAPSED);
+
+  button.textContent = list.classList.contains(CLASS_COLLAPSED)
+    ? list.dataset.labelExpand
+    : list.dataset.labelCollapse;
+};
+
+var createExpandableList = function (list, length) {
+  if ( length === void 0 ) length = 10;
+
+  var button = document.createElement('button');
+  button.textContent = list.dataset.labelExpand;
+  insertAfter(button, list);
+
+  list.classList.add(CLASS, CLASS_COLLAPSED);
+
+  button.addEventListener('click', function () { return toggle(list, button); });
+};
+
 var chartAttendees = document.querySelector('.js-chart-attendees');
 var listTopAttendees = document.querySelector('.js-list-top-attendees');
 var listTopFirstNames = document.querySelector('.js-list-top-first-names');
@@ -7230,6 +7257,10 @@ fetch('data/attendees.json')
     createAttendeesChart(chartAttendees, response, chartConfig);
     createTopAttendeesList(listTopAttendees, response);
     createTopFirstNameList(listTopFirstNames, response);
+  })
+  .then(function () {
+    createExpandableList(listTopAttendees);
+    createExpandableList(listTopFirstNames);
   })
   .catch(console.error);
 
