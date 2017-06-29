@@ -48,6 +48,20 @@ a:hover {
   margin-bottom: 1em;
 }
 
+.chart__line {
+  fill: none;
+  stroke: #0079ad;
+  stroke-width: 2;
+}
+
+.chart__line-value {
+  fill: #0079ad;
+}
+
+.chart__line-point {
+  fill: #0079ad;
+}
+
 .chart__value {
   fill: #fff;
   font-weight: bold;

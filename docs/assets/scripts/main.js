@@ -6833,6 +6833,57 @@ function y$3(p) {
   return p[1];
 }
 
+var line = function() {
+  var x = x$3,
+      y = y$3,
+      defined = constant$10(true),
+      context = null,
+      curve = curveLinear,
+      output = null;
+
+  function line(data) {
+    var i,
+        n = data.length,
+        d,
+        defined0 = false,
+        buffer;
+
+    if (context == null) { output = curve(buffer = path()); }
+
+    for (i = 0; i <= n; ++i) {
+      if (!(i < n && defined(d = data[i], i, data)) === defined0) {
+        if (defined0 = !defined0) { output.lineStart(); }
+        else { output.lineEnd(); }
+      }
+      if (defined0) { output.point(+x(d, i, data), +y(d, i, data)); }
+    }
+
+    if (buffer) { return output = null, buffer + "" || null; }
+  }
+
+  line.x = function(_) {
+    return arguments.length ? (x = typeof _ === "function" ? _ : constant$10(+_), line) : x;
+  };
+
+  line.y = function(_) {
+    return arguments.length ? (y = typeof _ === "function" ? _ : constant$10(+_), line) : y;
+  };
+
+  line.defined = function(_) {
+    return arguments.length ? (defined = typeof _ === "function" ? _ : constant$10(!!_), line) : defined;
+  };
+
+  line.curve = function(_) {
+    return arguments.length ? (curve = _, context != null && (output = curve(context)), line) : curve;
+  };
+
+  line.context = function(_) {
+    return arguments.length ? (_ == null ? context = output = null : output = curve(context = _), line) : context;
+  };
+
+  return line;
+};
+
 function sign$1(x) {
   return x < 0 ? -1 : 1;
 }
@@ -7128,6 +7179,93 @@ var createAttendeesChart = function (container, data, config) {
     .text(function (d, i) { return i + 2008; });
 };
 
+var getDataSimilarityRatio = function (accessor) {
+  var getSmallestArray = function (a, b) { return a.length < b.length ? a : b; };
+  var getLargestArray = function (a, b) { return a.length > b.length ? a : b; };
+
+  return {
+    data: function data(a, b) {
+      var c = getSmallestArray(a, b);
+      var d = getLargestArray(a, b);
+
+      return d.reduce(function (equalObjectCount, value) {
+        var key = accessor(value);
+        var isInOtherArray = c.some(function (d) { return key === accessor(d); });
+
+        if (isInOtherArray) {
+          return equalObjectCount + 1;
+        }
+
+        return equalObjectCount;
+      }, 0) / d.length;
+    },
+  };
+};
+
+var createReturningAttendeesChart = function (container, data, config) {
+  var height = config.height;
+  var heightInner = config.heightInner;
+  var padding = config.padding;
+  var width = config.width;
+  var widthInner = config.widthInner;
+
+  var returningAttendees = data.map(function (edition, i) {
+    if (i === 0) { return 0; }
+
+    var previousEdition = data[i - 1];
+
+    return getDataSimilarityRatio(function (d) { return d.name; })
+      .data(edition.attendees, previousEdition.attendees);
+  });
+
+  var barWidth = widthInner / data.length;
+  var barWidthHalf = barWidth * .5;
+  var fontSize = 16;
+
+  var scaleX = linear$2()
+    .domain([0, data.length])
+    .range([padding, padding + widthInner]);
+
+  var scaleY = linear$2()
+    .domain([0, 1])
+    .range([padding, padding + heightInner - padding]);
+
+  var svg = select(container)
+    .attr('height', height)
+    .attr('width', width);
+
+  var line$$1 = line()
+    .x(function (d, i) { return scaleX(i); })
+    .y(function (d) { return scaleY(1) - scaleY(d); });
+
+  var entry = svg.selectAll('g')
+    .data(returningAttendees)
+    .enter().append('g');
+
+  entry.append('path')
+    .attr('class', 'chart__line')
+    .datum(returningAttendees)
+    .attr('d', line$$1);
+
+  entry.append('circle')
+    .attr('class', 'chart__line-point')
+    .attr('cx', function (d, i) { return scaleX(i); })
+    .attr('cy', function (d) { return scaleY(1) - scaleY(d); })
+    .attr('r', 4);
+
+  entry.append('text')
+    .attr('class', 'chart__line-value text-middle')
+    .attr('x', function (d, i) { return scaleX(i); })
+    .attr('y', function (d) { return scaleY(1) - scaleY(d) + fontSize * 2; })
+    .text(function (d) { return format('.0%')(d); });
+
+  entry.append('text')
+    .attr('class', 'text-middle')
+    .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
+    .attr('y', scaleY(1) + padding + padding)
+    .text(function (d, i) { return i + 2008; });
+};
+
 var arrayUnique = function (arr, value) {
   if (arr.indexOf(value) === -1) {
     arr.push(value);
@@ -7156,8 +7294,8 @@ var countSimilarObjects = function () {
     },
 
     data: function data(data$1) {
-      return data$1.reduce(function (obj, attendee) {
-        var key = getKey(attendee);
+      return data$1.reduce(function (obj, item) {
+        var key = getKey(item);
 
         if (!(key in obj)) {
           obj[key] = 0;
@@ -7245,6 +7383,7 @@ var createExpandableList = function (list, length) {
 };
 
 var chartAttendees = document.querySelector('.js-chart-attendees');
+var chartReturningAttendees = document.querySelector('.js-chart-returning-attendees');
 var listTopAttendees = document.querySelector('.js-list-top-attendees');
 var listTopFirstNames = document.querySelector('.js-list-top-first-names');
 
@@ -7255,6 +7394,7 @@ fetch('data/attendees.json')
   .then(function (response) { return response.json(); })
   .then(function (response) {
     createAttendeesChart(chartAttendees, response, chartConfig);
+    createReturningAttendeesChart(chartReturningAttendees, response, chartConfig);
     createTopAttendeesList(listTopAttendees, response);
     createTopFirstNameList(listTopFirstNames, response);
   })

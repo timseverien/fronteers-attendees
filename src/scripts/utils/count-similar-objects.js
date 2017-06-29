@@ -8,8 +8,8 @@ export default () => {
     },
 
     data(data) {
-      return data.reduce((obj, attendee) => {
-        const key = getKey(attendee);
+      return data.reduce((obj, item) => {
+        const key = getKey(item);
 
         if (!(key in obj)) {
           obj[key] = 0;
