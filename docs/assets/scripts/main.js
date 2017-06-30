@@ -7311,6 +7311,7 @@ var createTopAttendeesList = function (container, data) {
     .data(attendees);
 
   var attendeesTopEntries = entries(attendeesTop)
+    .filter(function (d) { return d.value > 1; })
     .sort(compareEntriesByValueAndKey);
 
   var valueMapping = attendeesTopEntries

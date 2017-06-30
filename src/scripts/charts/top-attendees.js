@@ -13,6 +13,7 @@ export default (container, data) => {
     .data(attendees);
 
   const attendeesTopEntries = d3.entries(attendeesTop)
+    .filter(d => d.value > 1)
     .sort(compareEntriesByValueAndKey);
 
   const valueMapping = attendeesTopEntries
