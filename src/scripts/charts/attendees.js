@@ -24,7 +24,7 @@ export default (container, data, config) => {
 
   var color = d3.scaleLinear()
     .domain([0, data.length])
-    .range(['#0079ad', '#009de0']);
+    .range(['#00709f', '#009de0']);
 
   const svg = d3.select(container)
     .attr('height', height)

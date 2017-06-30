@@ -22,11 +22,17 @@
   <h2>Returning attendees trend</h2>
   <svg class="chart js-chart-returning-attendees"></svg>
 
-  <h2>Returning attendees</h2>
-  <ol class="js-list-top-attendees" data-label-expand="Show all" data-label-collapse="Show less"></ol>
+  <div class="grid">
+    <div class="grid__item grid__item--start">
+      <h2>Returning attendees</h2>
+      <ol class="js-list-top-attendees" data-label-expand="Show all" data-label-collapse="Show less"></ol>
+    </div>
 
-  <h2>First name ordered by popularity</h2>
-  <ol class="js-list-top-first-names" data-label-expand="Show all" data-label-collapse="Show less"></ol>
+    <div class="grid__item grid__item--end">
+      <h2>First name ordered by popularity</h2>
+      <ol class="js-list-top-first-names" data-label-expand="Show all" data-label-collapse="Show less"></ol>
+    </div>
+  </div>
 </main>
 
 {{> fork-me }}

@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500');
+
 * {
   box-sizing: inherit;
 }
 
 :focus {
-  outline: 2px solid #0079ad;
+  outline: 2px solid #00709f;
 }
 
 html {
@@ -13,7 +15,7 @@ html {
 body {
   background-color: #fcfcfc;
   color: #333;
-  font-family: sans-serif;
+  font-family: Roboto, sans-serif;
   line-height: 1.6;
 }
 
@@ -22,15 +24,15 @@ button {
   border: 0;
   color: #fff;
   font-weight: bold;
-  background-color: #009de0;
+  background-color: #00709f;
 }
 
 button:hover {
-  background-color: #0079ad;
+  background-color: #00709f;
 }
 
 a {
-  color: #0079ad;
+  color: #00709f;
   text-decoration: underline;
   text-decoration-skip: ink;
 }
@@ -51,16 +53,16 @@ a:hover {
 
 .chart__line {
   fill: none;
-  stroke: #0079ad;
+  stroke: #00709f;
   stroke-width: 2;
 }
 
 .chart__line-value {
-  fill: #0079ad;
+  fill: #00709f;
 }
 
 .chart__line-point {
-  fill: #0079ad;
+  fill: #00709f;
 }
 
 .chart__value {
@@ -74,4 +76,20 @@ a:hover {
 
 .expandable-list--collapsed li:nth-child(n+10) {
   display: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid__item {}
+
+.grid__item--start {
+  grid-column-start: 1;
+  grid-column-end: 2;
+}
+.grid__item--end {
+  grid-column-start: 2;
+  grid-column-end: 3;
 }
