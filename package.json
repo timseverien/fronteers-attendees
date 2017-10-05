@@ -8,8 +8,8 @@
   "license": "MIT",
   "scripts": {
     "build": "gulp",
-    "dev": "npm run build -- watch",
-    "data:update": "node ./bin/get-attendees.js > docs/data/attendees.json"
+    "data:update": "node ./bin/get-attendees.js > docs/data/attendees.json",
+    "start": "npm run build -- watch"
   },
   "devDependencies": {
     "globby": "^6.1.0",
