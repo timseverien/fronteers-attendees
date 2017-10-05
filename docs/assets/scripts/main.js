@@ -7347,6 +7347,74 @@ var createTopFirstNameList = function (container, data) {
     .text(function (d) { return ((d.key) + " (" + (d.value) + ")"); });
 };
 
+var hasAttendee = function (edition, name) { return edition.attendees
+  .some(function (attendee) { return attendee.name === name; }); };
+
+var createLoyalAttendees = function (container, data, config) {
+  var height = config.height;
+  var heightInner = config.heightInner;
+  var padding = config.padding;
+  var width = config.width;
+  var widthInner = config.widthInner;
+
+  var returningAttendees = data.map(function (edition, i, editions) {
+    if (i === 0) { return 1; }
+
+    var firstEdition = editions[0];
+    var previousEdition = editions[i - 1];
+    var returning = 0;
+
+    edition.attendees.forEach(function (attendee) {
+      returning += hasAttendee(firstEdition, attendee.name) ? 1 : 0;
+    });
+
+    return returning / firstEdition.attendees.length;
+  });
+
+  var barWidth = (widthInner / data.length) * .95;
+  var barWidthHalf = barWidth * .5;
+  var fontSize = 16;
+
+  var scaleX = linear$2()
+    .domain([0, data.length])
+    .range([padding, padding + widthInner]);
+
+  var scaleY = linear$2()
+    .domain([0, 1])
+    .range([padding, padding + heightInner - padding - fontSize]);
+
+  var color$$1 = linear$2()
+    .domain([0, data.length])
+    .range(['#00709f', '#009de0']);
+
+  var svg = select(container)
+    .attr('height', height)
+    .attr('width', width);
+
+  var entry = svg.selectAll('g')
+    .data(returningAttendees)
+    .enter().append('g');
+
+  entry.append('rect')
+    .attr('x', function (d, i) { return scaleX(i); })
+    .attr('y', function (d) { return scaleY(1) + padding - scaleY(d); })
+    .attr('fill', function (d, i) { return color$$1(i); })
+    .attr('height', function (d) { return scaleY(d); })
+    .attr('width', barWidth);
+
+  entry.append('text')
+    .attr('class', 'chart__value text-middle')
+    .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
+    .attr('y', scaleY(1))
+    .text(function (d) { return format('.1%')(d); });
+
+  entry.append('text')
+    .attr('class', 'text-middle')
+    .attr('x', function (d, i) { return barWidthHalf + scaleX(i); })
+    .attr('y', scaleY(1) + padding + padding)
+    .text(function (d, i) { return i + 2008; });
+};
+
 var CLASS = 'expandable-list';
 var CLASS_COLLAPSED = 'expandable-list--collapsed';
 
@@ -7378,6 +7446,7 @@ var chartAttendees = document.querySelector('.js-chart-attendees');
 var chartReturningAttendees = document.querySelector('.js-chart-returning-attendees');
 var listTopAttendees = document.querySelector('.js-list-top-attendees');
 var listTopFirstNames = document.querySelector('.js-list-top-first-names');
+var chartLoyalAttendees = document.querySelector('.js-chart-loyal-attendees');
 
 var chartConfig = createChartConfig(chartAttendees.parentElement);
 
@@ -7389,6 +7458,7 @@ fetch('data/attendees.json')
     createReturningAttendeesChart(chartReturningAttendees, response, chartConfig);
     createTopAttendeesList(listTopAttendees, response);
     createTopFirstNameList(listTopFirstNames, response);
+    createLoyalAttendees(chartLoyalAttendees, response, chartConfig);
   })
   .then(function () {
     createExpandableList(listTopAttendees);
